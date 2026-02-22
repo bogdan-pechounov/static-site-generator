@@ -78,7 +78,7 @@ def block_to_html_node(block: str, block_type: BlockType) -> HTMLNode:
             return ParentNode("pre", children=[LeafNode(tag="code", value=code_content)])
         case BlockType.QUOTE:
             lines = block.split("\n")
-            quote = " ".join([line.lstrip(">".strip()) for line in lines])
+            quote = " ".join([line.lstrip(">").strip() for line in lines])
             return ParentNode(tag="blockquote", children=text_to_children(quote))
         case BlockType.ORDERED_LIST:
             items = block.split("\n")
