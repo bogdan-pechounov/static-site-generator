@@ -1,41 +1,23 @@
 import os
 
-
-def rmdir_recursive(path: str):
-    if os.path.isdir(path):
-        print(f"Removing folder: {path}")
-        for file_name in os.listdir(path):
-            file_path = f"{path}/{file_name}"
-            rmdir_recursive(file_path)
-        os.rmdir(path)
-    elif os.path.isfile(path):
-        print(f"Removing file: {path}")
-        os.unlink(path)
-    else:
-        raise RuntimeError(f"Invalid path: {path}")
+from genate_html import generate_pages_recursive
+from utils import copy_directory, rmdir_recursive
 
 
-def copy_directory(source_directory: str, destination_directory: str):
+def main():
+    source_directory = "./static"
+    destination_directory = "./public"
+
+    print("Deleting public directory....")
     if os.path.exists(destination_directory):
         rmdir_recursive(destination_directory)
 
-    os.mkdir(destination_directory)
+    print("Copying static files to public directory...")
+    copy_directory(source_directory=source_directory, destination_directory=destination_directory)
 
-    for file_name in os.listdir(source_directory):
-        source_path = f"{source_directory}/{file_name}"
-        destination_path = f"{destination_directory}/{file_name}"
-
-        print(f"Copying {source_path} into {destination_path}")
-
-        if os.path.isfile(source_path):
-            with (
-                open(source_path, "rb") as source_file,
-                open(destination_path, "wb") as destination_file,
-            ):
-                destination_file.write(source_file.read())
-        elif os.path.isdir(source_path):
-            copy_directory(source_path, destination_path)
+    print("Generating content...")
+    generate_pages_recursive(dir_path_content="content", template_path="template.html", dest_dir_path="public")
 
 
 if __name__ == "__main__":
-    copy_directory("static", "public")
+    main()
