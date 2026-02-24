@@ -1,10 +1,13 @@
 import os
+import sys
 
 from genate_html import generate_pages_recursive
 from utils import copy_directory, rmdir_recursive
 
 
 def main():
+    base_path = sys.argv[1] if len(sys.argv) > 1 else "/"
+
     source_directory = "./static"
     destination_directory = "./docs"
 
@@ -20,6 +23,7 @@ def main():
         dir_path_content="content",
         template_path="template.html",
         dest_dir_path=destination_directory,
+        base_path=base_path,
     )
 
 

@@ -11,7 +11,7 @@ def extract_title(markdown: str):
     raise ValueError("no title found")
 
 
-def generate_page(from_path: str, template_path: str, dest_path: str):
+def generate_page(from_path: str, template_path: str, dest_path: str, base_path: str):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     with open(from_path, "r") as f:
@@ -24,7 +24,12 @@ def generate_page(from_path: str, template_path: str, dest_path: str):
     html_content = html_node.to_html()
     title = extract_title(markdown=markdown)
 
-    full_html = template.replace("{{ Title }}", title).replace("{{ Content }}", html_content)
+    full_html = (
+        template.replace("{{ Title }}", title)
+        .replace("{{ Content }}", html_content)
+        .replace('href="/', f'href="{base_path}')
+        .replace('src="/', f'src="{base_path}')
+    )
 
     dest_dir = os.path.dirname(dest_path)
     if not os.path.exists(dest_dir):
@@ -34,12 +39,14 @@ def generate_page(from_path: str, template_path: str, dest_path: str):
         f.write(full_html)
 
 
-def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str):
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str, base_path: str):
     for file_name in os.listdir(dir_path_content):
         file_path = f"{dir_path_content}/{file_name}"
         dest_path = f"{dest_dir_path}/{file_name.replace('.md', '.html')}"
 
         if os.path.isfile(file_path) and file_path.endswith(".md"):
-            generate_page(from_path=file_path, template_path=template_path, dest_path=dest_path)
+            generate_page(from_path=file_path, template_path=template_path, dest_path=dest_path, base_path=base_path)
         elif os.path.isdir(file_path):
-            generate_pages_recursive(dir_path_content=file_path, template_path=template_path, dest_dir_path=dest_path)
+            generate_pages_recursive(
+                dir_path_content=file_path, template_path=template_path, dest_dir_path=dest_path, base_path=base_path
+            )
